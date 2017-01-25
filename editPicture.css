@@ -1,0 +1,73 @@
+.drawCircleCursor{
+    cursor: crosshair;
+}
+.drawDiyCursor{
+    cursor: url("img/drawDiyCursor.png"), auto;
+}
+
+/* 裁剪 div */
+.canvasClipBox{
+    width: 100px;
+    height: 100px; 
+    border: 1px solid red;
+    position: absolute;
+
+    resize: both;
+    overflow:auto; 
+}
+.canvasClipBox .clipBoxMoveBtn{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    cursor: move;
+}
+.canvasClipBox .clipFinishBtn{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+}
+
+/* 添加文字 的textareaBox */
+.canvasTextAreaBox{
+    width: 300px;
+    height: 150px;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    z-index: 100;
+    left: calc( 50% - 100px );
+    top: calc( 50% - 100px );
+}
+.canvasTextAreaBox *{
+    box-sizing: border-box;
+}
+.canvasTextAreaBox > *{
+    width: 100%;
+}
+.canvasTextAreaBox .canvasTextConfigBox{
+    background: #000000;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+}
+.canvasTextAreaBox .canvasTextConfigBox .closeBtn{
+    float: right;
+}
+.canvasTextAreaBox .canvasTextConfigBox input[type=button],
+.canvasTextAreaBox .canvasTextConfigBox input[type=color],
+.canvasTextAreaBox .canvasTextConfigBox select{
+    height: 20px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    margin: 0px 10px;
+}
+.canvasTextAreaBox .canvasTextArea{
+    background: transparent;
+    resize: none;
+    flex: 1;
+    cursor: move;
+}
+.canvasTextAreaBox .canvasTextArea:focus{
+    background: #000000;
+    color: #ffffff !important;
+}

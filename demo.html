@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+
+    <!--<link href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">-->
+
+    <link href="editPicture.css" rel="stylesheet" type="text/css">
+    <script src="//apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="editPicture.js"></script>
+
+</head>
+<body>
+
+    <input class="selectFileBtn" type="file">
+    <input class="upLoadFileBtn" type="button" value="上传">
+    <br/><br/>
+
+
+    涂鸦操作：
+    <input class="setColorInput" type="color">
+    <input class="drawCircleBtn" type="button" value="绘制圆形">
+    <input class="drawDiyBtn" type="button" value="DIY涂鸦">
+    <input class="drawTextBtn" type="button" value="添加文字">
+    <br/><br/>
+
+    图片操作：
+    <input class="rotateLeftBtn" type="button" value="左转">
+    <input class="rotateRightBtn" type="button" value="右转">
+    <input class="clipPictureBtn" type="button" value="裁剪">
+    <input class="restoreBtn" type="button" value="撤销">
+    <br/><br/>
+
+    <div class="pictureBox"></div>
+    <!--<img src="img/testPicture.jpg" class="testPicture">-->
+
+    <script>
+//        $(function(){
+//            editPicture.init( $('.pictureBox') );
+//        });
+        $(window).load( function(){
+            editPicture.init( $('.pictureBox') );
+        })
+    </script>
+
+</body>
+</html>
