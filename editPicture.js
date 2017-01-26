@@ -11,6 +11,8 @@ var editPicture = ( function($){
         canvas: null, // canvas dom元素
         canvasContext: null, // 图形上下文
 
+        tempCanvas: null, // 用于 正在绘制图形 效果预览 的 canvas dom元素
+
         lineColor: "#000000", // 绘制 线条颜色
         lineWidth: 3, // 绘制 线条粗细
 
@@ -41,6 +43,7 @@ var editPicture = ( function($){
 
             var _content = '<div class="canvasClipBox">' + 
                                 '<button class="clipBoxMoveBtn">拖动</button>' +
+                                '<button class="clipCancelBtn">取消</button>' +
                                 '<button class="clipFinishBtn">确认</button></div>';
 
             this.$canvasClipBox = $(_content);
@@ -82,7 +85,7 @@ var editPicture = ( function($){
 
             if( this.canvas )  $(this.canvas).remove();// 移除原有 canvas
 
-            var w = Math.min( 900, img.width );// 当图片宽度超过 400px 时, 就压缩成 400px, 高度按比例计算
+            var w = Math.min( 900, img.width );// 压缩图片宽度, 高度按比例计算
             // var w = img.width;
             var h = img.height * (w / img.width);
             var max = ( w > h ? w : h );
@@ -92,7 +95,6 @@ var editPicture = ( function($){
             this.canvas.height = h;
 
             this.canvasContext = this.canvas.getContext('2d');// 图形上下文
-            //this.canvasContext.translate( w/2, h/2);
             this.canvasContext.drawImage(img, 0, 0, w, h);// 把图片绘制到 canvas 中
 
             // 设置容器宽度、高度
@@ -102,6 +104,26 @@ var editPicture = ( function($){
                 'text-align': 'center',
             });
             this.$canvasParent.append( this.canvas ); // canvas 插入页面
+
+            // 用于 正在绘制图形 效果预览 的 canvas dom元素
+            //this.tempCanvas = document.createElement('canvas');
+            //this.setTempCanvasStyleByCanvas(); // 根据 canvas 设置 tempCanvas 的样式、位置
+            //this.$canvasParent.append( this.tempCanvas ); // canvas 插入页面
+        },
+
+        // 根据 canvas 设置 tempCanvas 的样式、位置
+        setTempCanvasStyleByCanvas: function(){
+
+            var _canvasPosAndSizeObj = this.getItemPosAndSize( $(this.canvas) );
+
+            $( this.tempCanvas ).css({
+                'position': 'absolute',
+                'z-index': '-1',
+                width: _canvasPosAndSizeObj.width + 'px',
+                height: _canvasPosAndSizeObj.height + 'px',
+                left: _canvasPosAndSizeObj.left + 'px',
+                top: _canvasPosAndSizeObj.top + 'px',
+            });
         },
 
 
@@ -170,6 +192,9 @@ var editPicture = ( function($){
                 // 执行画图函数，如果不传，默认为绘画当前 canvas图片
                 if( drawImgFunc ) drawImgFunc( image );
                 else _self.canvasContext.drawImage(image, startX, startY, w, h, 0, 0, w, h );
+
+                // 根据 canvas 设置 tempCanvas 的样式、位置
+                //_self.setTempCanvasStyleByCanvas();
             };
             image.src = _self.canvas.toDataURL('image/png');
         },
@@ -210,7 +235,7 @@ var editPicture = ( function($){
             // 裁切整个画布
             this.canvasContext.beginPath();
             this.canvasContext.rect( startX, startY, _width, _height );
-            // this.canvasContext.stroke(); // 描绘边框
+            //this.canvasContext.stroke(); // 描绘边框
             this.canvasContext.clip(); // 裁剪
 
             // 根据当前canvas的 dataUrl，重新绘画canvas
@@ -484,6 +509,7 @@ var editPicture = ( function($){
                 }
             });
 
+            //////////////////////////////////////////////////////////////////////////
 
             // 左转 按钮 点击事件
             $('.rotateLeftBtn').click( function(){
@@ -495,6 +521,7 @@ var editPicture = ( function($){
                 _self.rotateCanvas( false );
             });
 
+            //////////////////////////////////////////////////////////////////////////
 
             // 裁剪 按钮 点击事件
             $('.clipPictureBtn').click( function(){
@@ -505,18 +532,25 @@ var editPicture = ( function($){
                 _self.$canvasClipBox.css({
                     'width': 'calc(' + _canvasPosAndSizeObj.width * 0.4 + 'px)',
                     'height': 'calc(' + _canvasPosAndSizeObj.height * 0.4 + 'px)',
-                    'left': 'calc(' + _canvasPosAndSizeObj.width * 0.3 + 'px)',
-                    'top': 'calc(' + _canvasPosAndSizeObj.height * 0.3 + 'px',
+                    'left': 'calc(' + ( _canvasPosAndSizeObj.left + _canvasPosAndSizeObj.width * 0.3 ) + 'px)',
+                    'top': 'calc(' + ( _canvasPosAndSizeObj.top + _canvasPosAndSizeObj.height * 0.3 ) + 'px',
                 }).show();
+            });
+
+            // 裁剪取消按钮 点击事件
+            _self.$canvasClipBox.find('.clipCancelBtn').click( function(){
+                _self.$canvasClipBox.hide(); // 隐藏
             });
 
             // 裁剪完成 按钮点击事件
             _self.$canvasClipBox.find('.clipFinishBtn').click( function(){
 
+                // 注意 canvas的 偏移
+                var _canvasPosAndSizeObj = _self.getItemPosAndSize( $(_self.canvas) );
                 var _clipBoxPosAndSizeObj = _self.getItemPosAndSize( _self.$canvasClipBox );
 
-                var _startX = _clipBoxPosAndSizeObj.left;
-                var _startY = _clipBoxPosAndSizeObj.top;
+                var _startX = _clipBoxPosAndSizeObj.left - _canvasPosAndSizeObj.left;
+                var _startY = _clipBoxPosAndSizeObj.top - _canvasPosAndSizeObj.top;
                 var _endX = _startX + _clipBoxPosAndSizeObj.width;
                 var _endY = _startY + _clipBoxPosAndSizeObj.height;
 
@@ -526,6 +560,8 @@ var editPicture = ( function($){
             });
 
         },
+
+        //////////////////////////////////////////////////////////////////////////
 
     }
 })( jQuery );
