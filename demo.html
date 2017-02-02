@@ -13,6 +13,9 @@
 </head>
 <body>
 
+
+    <br/><br/>
+
     <input class="selectFileBtn" type="file">
     <input class="upLoadFileBtn" type="button" value="上传">
     <br/><br/>
@@ -29,18 +32,20 @@
     <input class="rotateLeftBtn" type="button" value="左转">
     <input class="rotateRightBtn" type="button" value="右转">
     <input class="clipPictureBtn" type="button" value="裁剪">
-    <input class="restoreBtn" type="button" value="撤销">
+    <input class="clearAllBtn" type="button" value="擦除所有">
+    <!--<input class="restoreBtn" type="button" value="撤销">-->
     <br/><br/>
 
-    <div class="pictureBox"></div>
-    <!--<img src="img/testPicture.jpg" class="testPicture">-->
+    <!-- canvas 存放的容器（可自由设定id） -->
+    <div id="canvasBox"></div>
+    <!--<img src="img/testPicture.jpg" class="testPicture" style="display: none">-->
 
     <script>
-//        $(function(){
-//            editPicture.init( $('.pictureBox') );
-//        });
         $(window).load( function(){
-            editPicture.init( $('.pictureBox') );
+            editPicture.init( $('#canvasBox') );
+
+            // 用load，确保图片加载完成
+//            editPicture.initCanvasAndDrawPicture( $('.testPicture')[0] );  // 初始化 canvas，绘制图片
         })
     </script>
 

@@ -22,8 +22,6 @@ var editPicture = ( function($){
             this.$canvasParent = $canvasParent;
             this.$canvasParent.css( 'position', 'relative' );
 
-            //this.initCanvasAndDrawPicture( $('.testPicture')[0] );  // 初始化 canvas，绘制图片
-
             this.initCanvasClipBox();// 初始化 canvas里面，裁剪 box
             this.initCanvasTextAreaBox();// 初始化 canvas里面，添加文字 的textarea
             this.addBtnEvent(); // 按钮 事件监听
@@ -85,8 +83,8 @@ var editPicture = ( function($){
 
             if( this.canvas )  $(this.canvas).remove();// 移除原有 canvas
 
-            var w = Math.min( 900, img.width );// 压缩图片宽度, 高度按比例计算
-            // var w = img.width;
+            //var w = Math.min( 900, img.width );// 压缩图片宽度, 高度按比例计算
+             var w = img.width;
             var h = img.height * (w / img.width);
             var max = ( w > h ? w : h );
 
@@ -201,28 +199,29 @@ var editPicture = ( function($){
 
         // 旋转 canvas
         rotateCanvas: function( isLeft ){
+            if( this.canvas ) {
 
-            var _self = this;
-            var w = this.canvas.width;
-            var h = this.canvas.height;
+                var _self = this;
+                var w = this.canvas.width;
+                var h = this.canvas.height;
 
-            // 旋转 宽高互换
-            this.drawCanvasByDataUrl( function( image ){
+                // 旋转 宽高互换
+                this.drawCanvasByDataUrl(function (image) {
 
-                // 旋转画布
-                if( isLeft ){
-                    _self.canvasContext.rotate( -90 * Math.PI / 180 );
-                    _self.canvasContext.drawImage( image, -w, 0 );
-                }else{
-                    _self.canvasContext.rotate( 90 * Math.PI / 180 );
-                    _self.canvasContext.drawImage( image, 0, -h );
-                }
+                    // 旋转画布
+                    if (isLeft) {
+                        _self.canvasContext.rotate(-90 * Math.PI / 180);
+                        _self.canvasContext.drawImage(image, -w, 0);
+                    } else {
+                        _self.canvasContext.rotate(90 * Math.PI / 180);
+                        _self.canvasContext.drawImage(image, 0, -h);
+                    }
 
-                // 旋转画布后，二次绘画canvas，使得 不影响涂鸦功能
-                _self.drawCanvasByDataUrl();
+                    // 旋转画布后，二次绘画canvas，使得 不影响涂鸦功能
+                    _self.drawCanvasByDataUrl();
 
-            }, h, w );
-
+                }, h, w);
+            }
         },
 
         // 裁剪
@@ -319,7 +318,7 @@ var editPicture = ( function($){
 
             var _self = this;
 
-            // 选择图片，图片预览
+            // 选择图片，图片预览、绘制canvas
             $('.selectFileBtn').change( function(){
 
                 var _file = $(this)[0].files[0];
@@ -332,9 +331,13 @@ var editPicture = ( function($){
 
                         var img = new Image();//新建img对象
                         img.onload = function () {//设置其onload事件
-                            _self.initCanvasAndDrawPicture( img );
+
+                            _self.initCanvasAndDrawPicture( img );// canvas，绘制图片（参数：要绘制的 img dom对象）
                         };
                         img.src = _reader.result;//加载img对象
+
+                        // 普通图片预览
+                        $('body').prepend('<img src="' + _reader.result + '" style="width: 100px; height: 100px;"> <img src="' + _reader.result + '" style="display: none;">');
                     };
                     _reader.onerror = function () { console.error('reader error'); };
 
@@ -385,6 +388,10 @@ var editPicture = ( function($){
             // 撤销 按钮 点击事件
             $('.restoreBtn').click( function(){
                 _self.canvasContext.restore();
+            });
+
+            $('.clearAllBtn').click( function(){
+                if( _self.canvas ) _self.canvasContext.clearRect( 0, 0, _self.canvas.width, _self.canvas.height );
             });
 
 
@@ -525,16 +532,18 @@ var editPicture = ( function($){
 
             // 裁剪 按钮 点击事件
             $('.clipPictureBtn').click( function(){
+                if( _self.canvas ) {
 
-                // 调整 裁剪box的样式，并显示
-                var _canvasPosAndSizeObj = _self.getItemPosAndSize( $(_self.canvas) );
+                    // 调整 裁剪box的样式，并显示
+                    var _canvasPosAndSizeObj = _self.getItemPosAndSize($(_self.canvas));
 
-                _self.$canvasClipBox.css({
-                    'width': 'calc(' + _canvasPosAndSizeObj.width * 0.4 + 'px)',
-                    'height': 'calc(' + _canvasPosAndSizeObj.height * 0.4 + 'px)',
-                    'left': 'calc(' + ( _canvasPosAndSizeObj.left + _canvasPosAndSizeObj.width * 0.3 ) + 'px)',
-                    'top': 'calc(' + ( _canvasPosAndSizeObj.top + _canvasPosAndSizeObj.height * 0.3 ) + 'px',
-                }).show();
+                    _self.$canvasClipBox.css({
+                        'width': 'calc(' + _canvasPosAndSizeObj.width * 0.4 + 'px)',
+                        'height': 'calc(' + _canvasPosAndSizeObj.height * 0.4 + 'px)',
+                        'left': 'calc(' + ( _canvasPosAndSizeObj.left + _canvasPosAndSizeObj.width * 0.3 ) + 'px)',
+                        'top': 'calc(' + ( _canvasPosAndSizeObj.top + _canvasPosAndSizeObj.height * 0.3 ) + 'px',
+                    }).show();
+                }
             });
 
             // 裁剪取消按钮 点击事件
